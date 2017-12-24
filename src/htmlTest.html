@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Course Vector - HTML Speed Test</title>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<script src="net/hires/debug/Stats.js"></script>
+		<script src="flash/geom/Rectangle.js"></script>
+		<script src="flash/geom/Point.js"></script>
+		<script src="flash/geom/Matrix.js"></script>
+		<script src="cv/orion/Orion.js"></script>
+		<script src="cv/orion/SettingsVO.js"></script>
+		<script src="cv/orion/ParticleVO.js"></script>
+		<script src="cv/orion/output/SteadyOutput.js"></script>
+		<script src="cv/OrionSprite.js"></script>
+		<script>
+			document.addEventListener("DOMContentLoaded", init, false);
+			
+			var pte, txtPart, orion, stats, svo, txtMinFPS, minFPS = 29;
+			
+			function $(id) { return document.getElementById(id); }
+			
+			function init(event) {
+				txtPart = $('txtPart');
+				orion = $('orion');
+				txtMinFPS = $('txtMinFPS');
+				txtMinFPS.innerHTML = minFPS;
+				
+				setupScreen();
+				
+				setInterval(update, 3000);
+			}
+			
+			function updateMinFPS(value) {
+				if(value < 0) value = 0;
+				minFPS = value;
+				txtMinFPS.innerHTML = minFPS;
+			}
+			
+			function update() {
+				var fps = stats.getFPS();
+				if(fps < minFPS) svo.numberOfParticles -= 10;
+				if(fps > minFPS) svo.numberOfParticles += 10;
+				if(svo.numberOfParticles < 0) svo.numberOfParticles = 0;
+				txtPart.innerHTML = "<abbr title='Particles'>P</abbr>: " + String(pte.getNumParticles()) + "<br/><abbr title='Particles Per Render'>PPR</abbr>: " + svo.numberOfParticles;
+			}
+			
+			function setupScreen() {
+				
+				//import net.hires.debug.Stats;
+				stats = new net.hires.debug.Stats();
+				
+				// Initial Particle Settings
+				svo = new cv.orion.SettingsVO();
+				svo.lifeSpan = 1000;
+				svo.velocityXMin = -25;
+				svo.velocityXMax =  25;
+				svo.velocityYMin = -25;
+				svo.velocityYMax =  25;
+				svo.color =  0xFFFFFF;
+				//svo.colorMin =  0x111111;
+				//svo.colorMax =  0xFFFFFF;
+				//svo.rotateMin =  45;
+				//svo.rotateMax =  90;
+				svo.numberOfParticles = 10; // 10.1 - 10000 / 10 - 6000
+				
+				pte = new cv.OrionSprite(orion, 'span', 'particle', {settings:svo});
+				pte.setX(275);
+				pte.setY(250);
+			}
+		</script>
+		<style>
+			body {
+				background: black;
+				font: x-small sans-serif;
+				color: white;
+			}
+			
+			#container {
+				position:relative;
+				height: 500px;
+			}
+			
+			table {
+				color: white;
+				font: x-small sans-serif;
+				text-align: left;
+			}
+			
+			#orion {
+				position:absolute;
+				height: 500px;
+				width: 550px;
+				overflow: hidden;
+				margin: 0;
+				padding: 0;
+				z-index:-1;
+			}
+			
+			.particle {
+				position: absolute;
+				display:block;
+				width: 1px;
+				height: 1px;
+				overflow: hidden;
+				/*-webkit-border-radius: 6px;
+				-moz-border-radius: 6px;*/
+			}
+			
+			.stats {
+				float: left;
+				z-index:1;
+			}
+			
+			#txtPart {
+				display:block;
+				background-color: black;
+				margin:0;
+				font-weight: bold;
+				width: 70px;
+			}
+			
+			#hires {
+				width: 70px;
+				height: 90px;
+				font: x-small sans-serif;
+				line-height: 100%;
+			}
+			
+			#hires span {
+				float: left;
+			}
+			
+			#hires canvas {
+				float: left;
+			}
+		</style>
+		
+	</head>
+	<body>
+		<h1>HTML Speed Test</h1>
+		<div id="container">
+			<div class="stats">
+				<div id='hires'>
+					<span id='hires_fps'>FPS:</span>
+					<span id='hires_ms'>MS:</span>
+					<span id='hires_mem'>MEM:</span>
+					<span id='hires_memMax'>MAX:</span>
+					<canvas id='hires_bmp' width='70' height='50'></canvas>
+				</div>
+				<span id='txtPart'></span>
+			</div>
+			<div id="orion"></div>
+		</div>
+		
+		Minimum FPS <span id="txtMinFPS"></span> <input type="button" value="+" onclick="updateMinFPS(minFPS + 1)" /> <input type="button" value="-" onclick="updateMinFPS(minFPS - 1)" />
+		<h2><a href='index.html'>Canvas Version</a></h2>
+		<h2><a href='SpeedTest.html'>Flash (Bitmap) Version</a></h2>
+		<h2><a href='SpriteSpeedTest.html'>Flash (Sprite) Version</a></h2>
+	</body>
+</html>
