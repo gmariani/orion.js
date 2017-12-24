@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en-US" dir="ltr">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Test Canvas</title>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<script src="flash/geom/Rectangle.js"></script>
+		<script src="flash/geom/Point.js"></script>
+		<script src="flash/geom/Matrix.js"></script>
+		<script src="cv/orion/Orion.js"></script>
+		<script src="cv/orion/filters/FadeFilter.js"></script>
+		<script src="cv/orion/filters/FadeRenderFilter.js"></script>
+		<script src="cv/orion/filters/BlurRenderFilter.js"></script>
+		<script src="cv/orion/filters/GravityFilter.js"></script>
+		<script src="cv/orion/filters/ScaleFilter.js"></script>
+		<script src="cv/orion/filters/TurnToPathFilter.js"></script>
+		<script src="cv/orion/output/SteadyOutput.js"></script>
+		<script src="cv/OrionCanvas.js"></script>
+		<script>
+			document.addEventListener("DOMContentLoaded", init, false);
+
+			function $(id) { return document.getElementById(id); }
+			
+			function init(event) {
+				var orion = $('orion');
+				
+				var lineShape = function(ctx, particle) {
+					ctx.save();
+					ctx.beginPath();
+					ctx.translate(particle.x,particle.y);
+					ctx.rotate(particle.rotation * cv.orion.Orion.DEG2RAD); // Convert degrees to radians
+					ctx.moveTo(0, 0);
+					ctx.lineWidth = 1;
+					ctx.strokeStyle = 'rgba(' + (particle.color >> 16) + ',' + (particle.color >> 8 & 0xFF) + ',' + (particle.color & 0xFF) + ',' + particle.alpha + ')';
+					ctx.lineTo(200, 0);
+					ctx.stroke();
+					ctx.restore();
+				}
+				
+				var randomLifeSpan = function() {
+					return (Math.random() * 3000) + 3000;
+				}
+				
+				// Setup screen
+				var o = {};
+				o.settings = new cv.orion.SettingsVO();
+				o.settings.lifeSpan = 7000;
+				//o.settings.velocityXMin = -2;
+				//o.settings.velocityXMax = 2;
+				//o.settings.x = distributedX;
+				o.settings.velocityY = -1.5;
+				o.settings.velocityAngle = 45;
+				o.settings.numberOfParticles = 1;
+				
+				o.effectFilters = [new cv.orion.filters.TurnToPathFilter()];
+				//o.effectFilters[0] = new cv.orion.filters.GravityFilter(0.35);
+				//o.effectFilters[1] = new cv.orion.filters.ScaleFilter(0.98);
+				//o.effectFilters[2] = new cv.orion.filters.FadeFilter(0.99);
+				
+				o.preRenderFilters = [new cv.orion.filters.FadeRenderFilter(0.05), new cv.orion.filters.BlurRenderFilter(1)];
+				
+				o.output = new cv.orion.output.SteadyOutput(3);
+				
+				
+				
+				var e = new cv.OrionCanvas(orion, lineShape, o);
+				e.width = 1100;
+				e.height = 1;
+				e.y = 299;
+				e.x = -300;
+				e.getCoordinate = function(particle, emitter) {
+					var maxWidth = 1100, columnCount = 8, columnWidth = Math.round(maxWidth / columnCount);
+					particle.x = Math.round(Math.random() * columnCount) * columnWidth;
+					particle.y = emitter.randomRange(emitter.y, emitter.y + emitter.height);
+					return particle;
+				};
+				//e.debug = true;
+			}
+			
+			/*
+			// Bitmap //
+			var colorFilter:ColorMatrixFilter = new ColorMatrixFilter(getColor());
+			function getColor():Array {
+				var matrix:Array = [0.95, 0,   0,   0, 0,
+									0,    0.8, 0,   0, 0,
+									0,    0,   0.9, 0, 0,
+									0,    0,   0,   1, 0];
+				return matrix;
+			}
+			var bmpData:BitmapData = new BitmapData(stage.stageWidth, stage.stageHeight, true, 0);
+			var bmpr:BitmapRenderer = new BitmapRenderer(bmpData);
+			//bmpr.debug = true;
+			bmpr.preFilters.push(colorFilter);
+			bmpr.drawTargets.push(e);
+			bmpr.drawTargets.push(rse);
+			bmpr.drawTargets.push(fe);
+			bmpr.drawTargets.push(se);
+			this.addChild(bmpr);
+			*/
+		</script>
+		<style>
+			body {
+				background: black;
+				color: white;
+			}
+			canvas {
+				/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#8420a0+0,1538b5+100 */
+				background: #8420a0; /* Old browsers */
+				background: -moz-linear-gradient(top, #8420a0 0%, #1538b5 100%); /* FF3.6-15 */
+				background: -webkit-linear-gradient(top, #8420a0 0%,#1538b5 100%); /* Chrome10-25,Safari5.1-6 */
+				background: linear-gradient(to bottom, #8420a0 0%,#1538b5 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+				filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#8420a0', endColorstr='#1538b5',GradientType=0 ); /* IE6-9 */
+			}
+		</style>
+	</head>
+	<body>
+		<canvas id="orion" width="800" height="300"></canvas>
+	</body>
+</html>
