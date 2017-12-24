@@ -13,7 +13,7 @@ cv.orion.filters.BlurRenderFilter.prototype = {
 	//  Methods
 	//--------------------------------------
 
-	applyFilter: function(ctx, canvas) {
-		ctx.filter = 'blur(' + this._blur + 'px)';
+	applyFilter: function(orion) {
+		orion.canvasContext.filter = 'blur(' + this._blur + 'px)';
 	}
 };

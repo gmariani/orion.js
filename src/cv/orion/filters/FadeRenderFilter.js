@@ -12,11 +12,11 @@ cv.orion.filters.FadeRenderFilter.prototype = {
 	//  Methods
 	//--------------------------------------
 
-	applyFilter: function(ctx, canvas) {
-		ctx.globalAlpha = this._alpha;
-		ctx.globalCompositeOperation = "destination-out";  // fade out destination pixels
-		ctx.fillRect(0, 0, canvas.width, canvas.height);
-		ctx.globalCompositeOperation = "source-over";
-		ctx.globalAlpha = 1;
+	applyFilter: function(orion) {
+		orion.canvasContext.globalAlpha = this._alpha;
+		orion.canvasContext.globalCompositeOperation = "destination-out";  // fade out destination pixels
+		orion.canvasContext.fillRect(0, 0, orion.renderTarget.width, orion.renderTarget.height);
+		orion.canvasContext.globalCompositeOperation = "source-over";
+		orion.canvasContext.globalAlpha = 1;
 	}
 };

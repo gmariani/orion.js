@@ -1,31 +1,54 @@
-﻿/* global document */
+﻿/* global Orion, document */
+/*jshint esversion: 6 */
+
+const OrionHTML = (function () {
+	if (!Orion) throw Error('OrionHTML requires the Orion library');
+	
+	const getDebugFunc = function(orion) {
+		return function() {
+			// Emitter
+			// TODO maybe create an element to show the bounds of the emitter
+			orion.canvasContext.lineWidth = 1;
+			
+			// Render Target
+			orion.renderTarget.style.border = '1px solid #FF0000';
+		};
+	};
+	
+	/* Converts a hex number to a CSS hex value 0xff0000 => #ff0000 */
+	const hex2css = function(color) {
+		return "#" + ( '00000' + (color | 0).toString(16) ).substr(-6);
+	};
+	
+	const initParticle = function(particle) {
+		particle.target.style['-webkit-transform'] = 'rotate(' + particle.rotation + 'deg)';
+		particle.target.style['-moz-transform'] = 'rotate(' + particle.rotation + 'deg)';
+		particle.target.style.opacity = particle.alpha;
+		particle.target.style.backgroundColor = hex2css(particle.color);
+		particle.target.style.left = particle.x + "px";
+		particle.target.style.top = particle.y + "px";
+
+		this._root.appendChild(particle.target);
+	};
+	
+	const createInstance = function(root, element, cssClass, config) {
+		const orion = Orion.createOrion(config);
+		orion.renderTarget = element;
+		orion.root = root;
+		orion.cssClass = cssClass;
+		orion.particles = Orion.createParticle();
+		orion.renderDebug = getDebugFunc(orion);
+		return orion;
+	};
+
+	return { createInstance:createInstance };
+})();
 
 var cv = cv || {};
-
-cv.OrionHTML = function(root, element, cssClass, config) {
-	//super(config);
-	cv.orion.Orion.call(this, config);
-
-	this._element = element;
-	this._cssClass = cssClass;
-	this._particles = this.createParticle();
-	this._root = root;
-};
-
-// Extend
-cv.OrionHTML.prototype = Object.create(cv.orion.Orion.prototype);
-cv.OrionHTML.constructor = cv.OrionHTML;
-cv.OrionHTML.constructor.name = 'cv.OrionHTML';
 
 //--------------------------------------
 //  Properties
 //--------------------------------------
-
-Object.defineProperty(cv.OrionHTML.prototype, 'root', {
-	get: function() { return this._root; },
-	enumerable: true,
-	configurable: false
-});
 
 Object.defineProperty(cv.OrionHTML.prototype, 'CSSClass', {
 	get: function() { return this._cssClass; },
@@ -146,58 +169,6 @@ cv.OrionHTML.prototype.render = function(e) {
 //  Private
 //--------------------------------------
 
-cv.OrionHTML.prototype.hex2css = function(color) {
-	var col = color.toString(16);
-	while(col.length < 6) col = "0" + col;
-	return "#" + col;
-};
-
-cv.OrionHTML.prototype.additionalInit = function(p, pt) {
-	/*if (settings.velocityRotateMin != settings.velocityRotateMax) {
-		p.velocityZ = randomRange(settings.velocityRotateMin, settings.velocityRotateMax);
-	} else {
-		p.velocityZ = settings.velocityRotate;
-	}*/
-	
-	if (this.settings.colorMin != this.settings.colorMax) {
-		p.color = this.interpolateColor(this.settings.colorMin, this.settings.colorMax, Math.random());
-	} else if(!isNaN(this.settings.color)) {
-		p.color = this.settings.color;
-	}
-	
-	if (this.settings.alphaMin != this.settings.alphaMax) {
-		p.alpha = this.randomRange(this.settings.alphaMin, this.settings.alphaMax);
-	} else {
-		p.alpha = this.settings.alpha;
-	}
-	
-	/*var scale:Number = settings.scale;
-	if (settings.scaleMin != settings.scaleMax) {
-		scale = randomRange(settings.scaleMin, settings.scaleMax);
-	}*/
-	
-	var rotate = this.settings.rotate;
-	if (this.settings.rotateMin != this.settings.rotateMax) {
-		rotate = this.randomRange(this.settings.rotateMin, this.settings.rotateMax);
-	}
-	
-	// Update position/color
-	/*_mtx.identity();
-	_mtx.createBox(scale, scale, rotate * DEG2RAD, pt.x, pt.y);
-	p.target.transform.colorTransform = _clr;
-	p.target.transform.matrix = _mtx;*/
-	
-	p.x = pt.x;
-	p.y = pt.y;
-	p.target.style['-webkit-transform'] = 'rotate(' + rotate + 'deg)';
-	p.target.style['-moz-transform'] = 'rotate(' + rotate + 'deg)';
-	p.target.style.opacity = p.alpha;
-	p.target.style.backgroundColor = this.hex2css(p.color);
-	p.target.style.left = pt.x + "px";
-	p.target.style.top = pt.y + "px";
-	
-	this._root.appendChild(p.target);
-};
 
 cv.OrionHTML.prototype.createParticle = function(idx) {
 	// Create new particle
