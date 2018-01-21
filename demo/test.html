@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Course Vector - Orion Demo</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <script src="../src/OrionTest.js"></script>
+    <script src="net/hires/debug/Stats.js"></script>
+    <script src="flash/geom/Rectangle.js"></script>
+    <script src="flash/geom/Point.js"></script>
+    <script src="flash/geom/Matrix.js"></script>
+    <script src="cv/orion/Orion.js"></script>
+    <script src="cv/orion/SettingsVO.js"></script>
+    <script src="cv/orion/ParticleVO.js"></script>
+    <script src="cv/orion/output/SteadyOutput.js"></script>
+    <script src="cv/OrionPixel.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const orion = document.getElementById('orion');
+
+            // Initial Particle Settings
+            const svo = new cv.orion.SettingsVO();
+            svo.lifeSpan = 1000;
+            svo.velocityXMin = -25;
+            svo.velocityXMax = 25;
+            svo.velocityYMin = -25;
+            svo.velocityYMax = 25;
+            svo.numberOfParticles = 100; // 10.1 - 10000 / 10 - 6000
+
+            const ctx = orion.getContext('2d');
+            ctx.fillRect(0, 0, 550, 500);
+
+            const pte = new cv.OrionPixel(orion, {
+                settings: svo
+            });
+            pte.setX(275);
+            pte.setY(250);
+        }, false);
+    </script>
+    <style>
+        body {
+            background: black;
+            color: white;
+        }
+
+        #orion {
+            height: 100vh;
+            width: 100vw;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+
+</head>
+
+<body>
+    <h1>Orion Demo</h1>
+    <div id="container">
+        <canvas id='orion' width='550' height='500'></canvas>
+    </div>
+</body>
+
+</html>
